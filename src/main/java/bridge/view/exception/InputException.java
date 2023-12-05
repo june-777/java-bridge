@@ -5,7 +5,6 @@ public enum InputException {
     NOT_NUMERIC("숫자만 입력 가능합니다."),
     OUT_OF_RANGE("정수형 범위를 넘어섰습니다.");
 
-    private static final String PREFIX = "[ERROR] ";
     private final String message;
 
     InputException(String message) {
@@ -13,7 +12,7 @@ public enum InputException {
     }
 
     public String getMessage() {
-        return PREFIX + message;
+        return message;
     }
 
     public void make() {
