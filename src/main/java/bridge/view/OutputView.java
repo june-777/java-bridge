@@ -1,6 +1,7 @@
 package bridge.view;
 
-import bridge.domain.BridgeGameStatus;
+import bridge.domain.MoveResult;
+import bridge.domain.MovingStatus;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -9,7 +10,14 @@ import java.util.StringJoiner;
  */
 public class OutputView {
 
+    private static final String CORRECT = "O";
+    private static final String WRONG = "X";
+    private static final String EMPTY = " ";
+    private static final String UP = "U";
+    private static final String DOWN = "D";
     private static final OutputView outputView = new OutputView();
+    private StringJoiner upBridgeFormat;
+    private StringJoiner downBridgeFormat;
 
     private OutputView() {
     }
@@ -23,62 +31,105 @@ public class OutputView {
         System.out.println();
     }
 
-    /**
-     * 현재까지 이동한 다리의 상태를 정해진 형식에 맞춰 출력한다.
-     * <p>
-     * 출력을 위해 필요한 메서드의 인자(parameter)는 자유롭게 추가하거나 변경할 수 있다.
-     */
-    // TODO: 메서드 분리, 상수처리 필요
-    public void printMap(List<String> bridge, int currentPosition, BridgeGameStatus result) {
-        StringJoiner upBridgeFormat = new StringJoiner(" | ", "[ ", " ]");
-        StringJoiner downBridgeFormat = new StringJoiner(" | ", "[ ", " ]");
+    public void printMap(List<String> bridge, int currentPosition, MovingStatus result) {
+        initBridgeFormat();
+        updateBridgeFormat(bridge, currentPosition, result);
+        printBridgeResult(upBridgeFormat, downBridgeFormat);
+    }
+
+    public void printResult(List<String> bridge, MoveResult result, int tryCount) {
+        System.out.println(Message.RESULT.message);
+        initBridgeFormat();
+        updateBridgeFormat(bridge, result.currentPosition(), result.movingStatus());
+        printBridgeResult(upBridgeFormat, downBridgeFormat);
+        System.out.printf(Message.SUCCESS_OR_NOT.message, result.movingStatus().getKoreanText());
+        System.out.println();
+        System.out.printf(Message.TOTAL_TRY_COUNT.message, tryCount);
+    }
+
+    private void initBridgeFormat() {
+        upBridgeFormat = new StringJoiner(" | ", "[ ", " ]");
+        downBridgeFormat = new StringJoiner(" | ", "[ ", " ]");
+    }
+
+    private void updateBridgeFormat(List<String> bridge, int currentPosition, MovingStatus result) {
+        addBeforeCurrentPosition(bridge, currentPosition);
+        String lastTile = bridge.get(currentPosition);
+        addCurrentPosition(result, lastTile, upBridgeFormat, downBridgeFormat);
+    }
+
+    private void addBeforeCurrentPosition(List<String> bridge, int currentPosition) {
         for (int position = 0; position < currentPosition; position++) {
             String tile = bridge.get(position);
-            if (tile.equals("U")) {
-                upBridgeFormat.add("O");
-                downBridgeFormat.add(" ");
-                continue;
-            }
-            upBridgeFormat.add(" ");
-            downBridgeFormat.add("O");
+            addCorrectTileSign(tile, upBridgeFormat, downBridgeFormat);
         }
-        String lastTile = bridge.get(currentPosition);
-        if (lastTile.equals("U")) {
-            if (result == BridgeGameStatus.SUCCESS) {
-                upBridgeFormat.add("O");
-                downBridgeFormat.add(" ");
-            } else {
-                upBridgeFormat.add(" ");
-                downBridgeFormat.add("X");
-            }
+    }
+
+    private void addCurrentPosition(MovingStatus result, String lastTile, StringJoiner upBridgeFormat,
+                                    StringJoiner downBridgeFormat) {
+        if (lastTile.equals(UP)) {
+            updateAboutLastTileIsU(result, upBridgeFormat, downBridgeFormat);
         }
-        if (lastTile.equals("D")) {
-            if (result == BridgeGameStatus.FAIL) {
-                upBridgeFormat.add("X");
-                downBridgeFormat.add(" ");
-            } else {
-                upBridgeFormat.add(" ");
-                downBridgeFormat.add("O");
-            }
+        if (lastTile.equals(DOWN)) {
+            updateAboutLastTileIsD(result, upBridgeFormat, downBridgeFormat);
         }
-        printBridgeResult(upBridgeFormat, downBridgeFormat);
+    }
+
+    private static void updateAboutLastTileIsU(MovingStatus result, StringJoiner upBridgeFormat,
+                                               StringJoiner downBridgeFormat) {
+        if (result == MovingStatus.SUCCESS) {
+            addCorrectSign(upBridgeFormat);
+            addEmptySign(downBridgeFormat);
+            return;
+        }
+        addEmptySign(upBridgeFormat);
+        addWrongSign(downBridgeFormat);
+    }
+
+    private void updateAboutLastTileIsD(MovingStatus result, StringJoiner upBridgeFormat,
+                                        StringJoiner downBridgeFormat) {
+        if (result == MovingStatus.FAIL) {
+            addWrongSign(upBridgeFormat);
+            addEmptySign(downBridgeFormat);
+            return;
+        }
+        addEmptySign(upBridgeFormat);
+        addCorrectSign(downBridgeFormat);
+    }
+
+    private static void addCorrectTileSign(String tile, StringJoiner upBridgeFormat, StringJoiner downBridgeFormat) {
+        if (tile.equals(UP)) {
+            addCorrectSign(upBridgeFormat);
+            addEmptySign(downBridgeFormat);
+            return;
+        }
+        addEmptySign(upBridgeFormat);
+        addCorrectSign(downBridgeFormat);
+    }
+
+    private static void addWrongSign(StringJoiner upBridgeFormat) {
+        upBridgeFormat.add(WRONG);
+    }
+
+    private static void addEmptySign(StringJoiner downBridgeFormat) {
+        downBridgeFormat.add(EMPTY);
+    }
+
+    private static StringJoiner addCorrectSign(StringJoiner upBridgeFormat) {
+        return upBridgeFormat.add(CORRECT);
     }
 
     private static void printBridgeResult(StringJoiner upBridgeFormat, StringJoiner downBridgeFormat) {
         System.out.println(upBridgeFormat);
         System.out.println(downBridgeFormat);
-    }
-
-    /**
-     * 게임의 최종 결과를 정해진 형식에 맞춰 출력한다.
-     * <p>
-     * 출력을 위해 필요한 메서드의 인자(parameter)는 자유롭게 추가하거나 변경할 수 있다.
-     */
-    public void printResult() {
+        System.out.println();
     }
 
     private enum Message {
-        START("다리 건너기 게임을 시작합니다.");
+        START("다리 건너기 게임을 시작합니다."),
+        RESULT("최종 게임 결과"),
+        SUCCESS_OR_NOT("게임 성공 여부: %s"),
+        TOTAL_TRY_COUNT("총 시도한 횟수: %d");
 
         private final String message;
 
