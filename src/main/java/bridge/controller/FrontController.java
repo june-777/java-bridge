@@ -51,7 +51,7 @@ public class FrontController {
     }
 
     private ApplicationStatus updateApplicationStatus(MoveResult moveResult, ApplicationStatus applicationStatus) {
-        if (moveResult.bridgeGameStatus() == MovingStatus.FAIL) {
+        if (moveResult.movingStatus() == MovingStatus.FAIL) {
             applicationStatus = ExceptionHandler.getOrRetry(this::initApplicationStatus);
         }
         return applicationStatus;
