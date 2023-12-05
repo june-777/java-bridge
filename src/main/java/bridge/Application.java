@@ -1,8 +1,13 @@
 package bridge;
 
-public class Application {
+import bridge.configuration.AppConfig;
+import bridge.controller.FrontController;
 
+public class Application {
     public static void main(String[] args) {
-        // TODO: 프로그램 구현
+        AppConfig appConfig = new AppConfig();
+        FrontController frontController = appConfig.frontController();
+
+        frontController.process();
     }
 }
