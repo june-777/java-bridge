@@ -1,7 +1,6 @@
 package bridge.controller;
 
 import bridge.BridgeGame;
-import bridge.domain.BridgeGameStatus;
 import bridge.domain.MoveCommand;
 import bridge.domain.MoveResult;
 import bridge.view.InputView;
@@ -17,13 +16,13 @@ public class BridgeController {
         this.outputView = outputView;
     }
 
-    public BridgeGameStatus process(final BridgeGame bridgeGame) {
+    public MoveResult process(final BridgeGame bridgeGame) {
         MoveCommand moveCommand = ExceptionHandler.getOrRetry(this::initMoveCommand);
 
         MoveResult moveResult = bridgeGame.move(moveCommand);
         renderingMoveResult(bridgeGame.getBridge(), moveResult);
 
-        return moveResult.bridgeGameStatus();
+        return moveResult;
     }
 
     private MoveCommand initMoveCommand() {
@@ -32,7 +31,10 @@ public class BridgeController {
     }
 
     private void renderingMoveResult(List<String> bridge, MoveResult moveResult) {
-        outputView.printMap(bridge, moveResult.currentPosition(), moveResult.bridgeGameStatus());
+        outputView.printMap(bridge, moveResult.currentPosition(), moveResult.movingStatus());
     }
 
+    public void renderingFinalResult(final BridgeGame bridgeGame, final MoveResult moveResult) {
+        outputView.printResult(bridgeGame.getBridge(), moveResult, moveResult.tryCount());
+    }
 }
