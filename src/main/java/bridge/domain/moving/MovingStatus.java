@@ -1,4 +1,4 @@
-package bridge.domain;
+package bridge.domain.moving;
 
 public enum MovingStatus {
     FAIL("실패"),

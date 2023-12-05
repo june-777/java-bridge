@@ -2,6 +2,7 @@ package bridge;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import bridge.domain.bridge.BridgeMaker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -1,10 +1,10 @@
 package bridge.controller;
 
-import bridge.BridgeGame;
-import bridge.BridgeMaker;
-import bridge.domain.BridgeGameStatus;
-import bridge.domain.MoveResult;
-import bridge.domain.MovingStatus;
+import bridge.domain.bridge.BridgeGame;
+import bridge.domain.bridge.BridgeGameStatus;
+import bridge.domain.bridge.BridgeMaker;
+import bridge.domain.moving.MoveResult;
+import bridge.domain.moving.MovingStatus;
 import bridge.view.InputView;
 import bridge.view.OutputView;
 import java.util.List;

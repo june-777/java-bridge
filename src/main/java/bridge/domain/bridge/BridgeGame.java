@@ -1,9 +1,8 @@
-package bridge;
+package bridge.domain.bridge;
 
-import bridge.domain.BridgeGameStatus;
-import bridge.domain.MoveCommand;
-import bridge.domain.MoveResult;
-import bridge.domain.MovingStatus;
+import bridge.domain.moving.MoveCommand;
+import bridge.domain.moving.MoveResult;
+import bridge.domain.moving.MovingStatus;
 import java.util.Collections;
 import java.util.List;
 

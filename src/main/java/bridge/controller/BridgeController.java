@@ -1,8 +1,8 @@
 package bridge.controller;
 
-import bridge.BridgeGame;
-import bridge.domain.MoveCommand;
-import bridge.domain.MoveResult;
+import bridge.domain.bridge.BridgeGame;
+import bridge.domain.moving.MoveCommand;
+import bridge.domain.moving.MoveResult;
 import bridge.view.InputView;
 import bridge.view.OutputView;
 import java.util.List;
