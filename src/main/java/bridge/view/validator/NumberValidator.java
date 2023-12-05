@@ -14,7 +14,6 @@ public class NumberValidator {
 
     public static void validate(String input) {
         validateBlank(input);
-        System.out.println("blankTest Done = ");
         validateNumeric(input);
         validateInteger(input);
     }
