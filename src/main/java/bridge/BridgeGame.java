@@ -1,6 +1,8 @@
 package bridge;
 
 import bridge.domain.BridgeGameStatus;
+import bridge.domain.MoveCommand;
+import bridge.domain.MoveResult;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,8 +27,41 @@ public class BridgeGame {
         return BridgeGameStatus.ING;
     }
 
+    public MoveResult move(MoveCommand moveCommand) {
+        if (!isEndOfBridge() && canGoNextTile(moveCommand)) {
+            nextPosition++;
+            return new MoveResult(BridgeGameStatus.SUCCESS, getCurrentPosition());
+        }
+        MoveResult moveResult = new MoveResult(BridgeGameStatus.FAIL, nextPosition);
+        retry(moveCommand);
+        return moveResult;
+    }
+
     private boolean isEndOfBridge() {
         return nextPosition == bridge.size();
+    }
+
+    private boolean canGoNextTile(MoveCommand moveCommand) {
+        String tile = getNextTile();
+        String command = moveCommand.getCommand();
+        return tile.equals(command);
+    }
+
+    private void retry(MoveCommand moveCommand) {
+        nextPosition = 0;
+        tryCount++;
+    }
+
+    private String getNextTile() {
+        return bridge.get(nextPosition);
+    }
+
+    public int getCurrentPosition() {
+        return nextPosition - 1;
+    }
+
+    public int getTryCount() {
+        return tryCount;
     }
 
     public List<String> getBridge() {
