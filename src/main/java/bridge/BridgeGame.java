@@ -3,12 +3,10 @@ package bridge;
 import bridge.domain.BridgeGameStatus;
 import bridge.domain.MoveCommand;
 import bridge.domain.MoveResult;
+import bridge.domain.MovingStatus;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * 다리 건너기 게임을 관리하는 클래스
- */
 public class BridgeGame {
 
     private final List<String> bridge;
@@ -16,7 +14,6 @@ public class BridgeGame {
     private int nextPosition;
 
     public BridgeGame(List<String> bridge) {
-        System.out.println("bridge = " + bridge); // TODO: 출력 제거할 것
         this.bridge = bridge;
     }
 
@@ -30,10 +27,10 @@ public class BridgeGame {
     public MoveResult move(MoveCommand moveCommand) {
         if (!isEndOfBridge() && canGoNextTile(moveCommand)) {
             nextPosition++;
-            return new MoveResult(BridgeGameStatus.SUCCESS, getCurrentPosition());
+            return new MoveResult(MovingStatus.SUCCESS, getCurrentPosition(), tryCount);
         }
-        MoveResult moveResult = new MoveResult(BridgeGameStatus.FAIL, nextPosition);
-        retry(moveCommand);
+        MoveResult moveResult = new MoveResult(MovingStatus.FAIL, nextPosition, tryCount);
+        retry();
         return moveResult;
     }
 
@@ -47,7 +44,7 @@ public class BridgeGame {
         return tile.equals(command);
     }
 
-    private void retry(MoveCommand moveCommand) {
+    private void retry() {
         nextPosition = 0;
         tryCount++;
     }
@@ -56,12 +53,8 @@ public class BridgeGame {
         return bridge.get(nextPosition);
     }
 
-    public int getCurrentPosition() {
+    private int getCurrentPosition() {
         return nextPosition - 1;
-    }
-
-    public int getTryCount() {
-        return tryCount;
     }
 
     public List<String> getBridge() {
