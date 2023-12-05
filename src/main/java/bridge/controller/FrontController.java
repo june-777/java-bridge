@@ -3,7 +3,8 @@ package bridge.controller;
 import bridge.BridgeGame;
 import bridge.BridgeMaker;
 import bridge.domain.BridgeGameStatus;
-import bridge.domain.GameCommand;
+import bridge.domain.MoveResult;
+import bridge.domain.MovingStatus;
 import bridge.view.InputView;
 import bridge.view.OutputView;
 import java.util.List;
@@ -26,6 +27,7 @@ public class FrontController {
     public void process() {
         outputView.printStart();
         BridgeGame bridgeGame = ExceptionHandler.getOrRetry(this::initBridgeGame);
+
         startBridge(bridgeGame);
     }
 
@@ -36,20 +38,31 @@ public class FrontController {
     }
 
     private void startBridge(final BridgeGame bridgeGame) {
-        while (bridgeGame.getStatus() == BridgeGameStatus.ING) {
-            BridgeGameStatus status = bridgeController.process(bridgeGame);
+        ApplicationStatus applicationStatus = ApplicationStatus.RUNNING;
+        while (true) {
+            MoveResult moveResult = bridgeController.process(bridgeGame);
+            applicationStatus = updateApplicationStatus(moveResult, applicationStatus);
 
-            if (status == BridgeGameStatus.FAIL) {
-                GameCommand gameCommand = ExceptionHandler.getOrRetry(this::initGameCommand);
-                if (gameCommand == GameCommand.Q) {
-                    break;
-                }
+            if (isEnd(applicationStatus, bridgeGame.getStatus())) {
+                bridgeController.renderingFinalResult(bridgeGame, moveResult);
+                break;
             }
         }
     }
 
-    private GameCommand initGameCommand() {
+    private ApplicationStatus updateApplicationStatus(MoveResult moveResult, ApplicationStatus applicationStatus) {
+        if (moveResult.bridgeGameStatus() == MovingStatus.FAIL) {
+            applicationStatus = ExceptionHandler.getOrRetry(this::initApplicationStatus);
+        }
+        return applicationStatus;
+    }
+
+    private ApplicationStatus initApplicationStatus() {
         String gameCommandInput = inputView.readGameCommand();
-        return GameCommand.of(gameCommandInput);
+        return ApplicationStatus.of(gameCommandInput);
+    }
+
+    private boolean isEnd(final ApplicationStatus applicationStatus, final BridgeGameStatus bridgeGameStatus) {
+        return applicationStatus == ApplicationStatus.QUIT || bridgeGameStatus == BridgeGameStatus.FINISH;
     }
 }
